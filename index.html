@@ -757,7 +757,53 @@ function initAnalysis() {
 
   if (!logs.length) {
     if (homeChart) { homeChart.destroy(); homeChart = null; }
-    body.innerHTML = '<div class="empty-state"><p>Start chatting with your AI Concierge to see your analysis.</p></div>';
+    body.innerHTML = `
+      <div class="grid2" style="margin-bottom:12px">
+        <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div class="section-lbl" style="margin-bottom:8px">Cycle tracking</div>
+          <div style="font-size:22px;font-weight:600;color:var(--t3);margin-bottom:4px">—</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:14px">No stage set</div>
+          <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:6px"></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3)"><span>PRE</span><span>PERI</span><span>MENO</span><span>POST</span></div>
+        </div>
+        <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div class="section-lbl" style="margin-bottom:8px">Mood</div>
+          <div style="font-size:22px;font-weight:600;color:var(--t3);margin-bottom:10px">—</div>
+          <div style="height:44px;background:var(--border);border-radius:6px;opacity:.35"></div>
+        </div>
+      </div>
+      <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="section-lbl" style="margin-bottom:0">Sleep · Last night</div>
+          <div style="display:flex;gap:10px;font-size:10px;color:var(--t3)"><span>Awake</span><span>REM</span><span>Light</span><span>Deep</span></div>
+        </div>
+        <div style="height:60px;background:var(--border);border-radius:6px;opacity:.35;margin-bottom:8px"></div>
+        <div style="font-size:12px;color:var(--t3)">— · No data</div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div class="section-lbl" style="margin-bottom:8px">Stress</div>
+          <div style="font-size:28px;font-weight:600;color:var(--t3)">—<span style="font-size:14px;font-weight:400">/100</span></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:6px">No data yet</div>
+        </div>
+        <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div class="section-lbl" style="margin-bottom:8px">Hot flashes</div>
+          <div style="font-size:28px;font-weight:600;color:var(--t3)">—<span style="font-size:13px;font-weight:400"> today</span></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:6px">No data yet</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div class="section-lbl" style="margin-bottom:8px">Energy</div>
+          <div style="font-size:28px;font-weight:600;color:var(--t3)">—<span style="font-size:14px;font-weight:400">/100</span></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:6px">No data yet</div>
+        </div>
+        <div style="background:var(--inset);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div class="section-lbl" style="margin-bottom:8px">Cognition</div>
+          <div style="font-size:28px;font-weight:600;color:var(--t3)">—<span style="font-size:14px;font-weight:400">/5</span></div>
+          <div style="font-size:11px;color:var(--t3);margin-top:6px">No data yet</div>
+        </div>
+      </div>`;
     return;
   }
 
