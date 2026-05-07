@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>romi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:     #f4f5f7;
+      --card:   #ffffff;
+      --border: #eaecf0;
+      --brand:  #e0457b;
+      --bl:     #fdf2f7;
+      --bb:     #f9c4d9;
+      --t1:     #111827;
+      --t2:     #6b7280;
+      --t3:     #9ca3af;
+      --inset:  #f8f9fb;
+      --shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--t1); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 24px; }
+    .nav-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: Georgia, serif; font-size: 20px; letter-spacing: -0.02em; color: var(--t1); cursor: pointer; }
+    .logo em { color: var(--brand); font-style: italic; }
+    .nav-links { display: flex; gap: 2px; }
+    .nav-btn { padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--t2); background: none; border: none; cursor: pointer; transition: color .12s, background .12s; font-family: inherit; }
+    .nav-btn:hover { color: var(--t1); background: var(--inset); }
+    .nav-btn.active { color: var(--brand); background: var(--bl); }
+
+    /* LAYOUT */
+    main { max-width: 960px; margin: 0 auto; padding: 28px 24px 64px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .ph { margin-bottom: 22px; }
+    .ph h1 { font-family: Georgia, serif; font-size: 26px; font-weight: 600; color: var(--t1); margin-bottom: 3px; }
+    .ph p  { font-size: 13px; color: var(--t2); }
+
+    /* CARDS */
+    .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+    .card-hd { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-hd-l { display: flex; align-items: center; gap: 10px; }
+    .card-hd-r { display: flex; align-items: center; gap: 8px; }
+    .hd-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--bl); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hd-icon svg { width: 13px; height: 13px; stroke: var(--brand); }
+    .hd-title { font-size: 12px; font-weight: 600; color: var(--t1); }
+    .hd-sub   { font-size: 11px; color: var(--t3); }
+    .card-body { padding: 16px 18px; }
+
+    /* GRID */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; transition: background .12s, opacity .12s; font-family: inherit; }
+    .btn svg { width: 13px; height: 13px; }
+    .btn-brand { background: var(--brand); color: #fff; }
+    .btn-brand:hover { background: #c93c6d; }
+    .btn-brand:disabled { opacity: .4; cursor: default; }
+    .btn-ghost { background: var(--inset); color: var(--t2); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: #eff1f4; }
+    .btn-icon { width: 28px; height: 28px; padding: 0; border-radius: 50%; background: var(--inset); border: 1px solid var(--border); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .12s; }
+    .btn-icon svg { width: 12px; height: 12px; stroke: var(--t3); }
+    .btn-icon:hover { background: #eff1f4; }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    .spinning { animation: spin .45s ease; }
+    .link-s { font-size: 12px; font-weight: 500; color: var(--brand); background: none; border: none; cursor: pointer; font-family: inherit; text-decoration: none; }
+    .link-s:hover { text-decoration: underline; }
+    .badge-beta { display: inline-flex; align-items: center; gap: 3px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; background: var(--bl); color: var(--brand); }
+    .badge-beta svg { width: 10px; height: 10px; stroke: var(--brand); }
+
+    /* SAVE BUTTON */
+    .save-btn { width: 26px; height: 26px; border-radius: 50%; border: none; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .12s; }
+    .save-btn svg { width: 13px; height: 13px; stroke: var(--t3); fill: none; transition: stroke .15s; }
+    .save-btn svg path { fill: none; transition: fill .15s; }
+    .save-btn:hover svg { stroke: var(--brand); }
+    .save-btn.saved svg { stroke: var(--brand); }
+    .save-btn.saved svg path { fill: var(--brand); }
+
+    /* ── RESOURCES WIDGET ── */
+    .res-list { display: flex; flex-direction: column; gap: 8px; }
+    .res-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--inset); border: 1px solid var(--border); border-radius: 10px; }
+    .res-item-body { flex: 1; min-width: 0; }
+    .res-item-title { font-size: 12px; font-weight: 500; color: var(--t1); line-height: 1.45; margin-bottom: 4px; }
+    .res-link { color: var(--t1); text-decoration: none; transition: color .12s; display: block; }
+    .res-link:hover { color: var(--brand); }
+    .res-item-meta { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--t3); }
+    .cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── DOCTOR QUESTIONS ── */
+    .q-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; margin-bottom: 4px; border-radius: 9px; cursor: pointer; transition: background .12s; }
+    .q-row:hover { background: var(--bl); }
+    .q-row:hover .q-txt { color: var(--brand); }
+    .q-row:hover .q-arrow svg { stroke: var(--brand); }
+    .q-arrow svg { width: 11px; height: 11px; stroke: var(--t3); flex-shrink: 0; transition: stroke .12s; }
+    .q-txt { font-size: 12px; line-height: 1.45; color: var(--t2); flex: 1; transition: color .12s; }
+    .q-add { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    #qNewInput { flex: 1; font-size: 12px; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; outline: none; background: var(--inset); color: var(--t1); font-family: inherit; }
+    #qNewInput:focus { border-color: var(--brand); }
+
+    /* ── ANALYSIS ── */
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-box { background: var(--inset); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .stat-lbl { font-size: 11px; color: var(--t3); margin-bottom: 3px; }
+    .stat-val { font-size: 20px; font-weight: 600; color: var(--t1); }
+    .stat-detail { font-size: 11px; color: var(--t3); margin-top: 2px; }
+    .sym-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+    .sym-row svg { width: 12px; height: 12px; stroke: var(--t3); flex-shrink: 0; }
+    .sym-lbl { font-size: 12px; color: var(--t2); flex: 1; }
+    .sym-bar-track { width: 60px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .sym-bar-fill { height: 100%; background: var(--brand); border-radius: 2px; }
+    .sym-cnt { font-size: 11px; color: var(--t3); min-width: 20px; text-align: right; }
+    .section-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--t3); margin-bottom: 8px; }
+    .chart-wrap { margin-bottom: 14px; }
+
+    /* ── AI CONCIERGE PAGE ── */
+    .ai-wrap { max-width: 700px; margin: 0 auto; }
+    .chat-msgs { padding: 18px; display: flex; flex-direction: column; gap: 10px; min-height: 420px; max-height: 540px; overflow-y: auto; }
+    .msg { display: flex; }
+    .msg.user { justify-content: flex-end; }
+    .bubble { max-width: 78%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.55; }
+    .msg.ai   .bubble { background: var(--inset); border: 1px solid var(--border); color: var(--t1); }
+    .msg.user .bubble { background: var(--brand); color: #fff; }
+    .dp-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,.22); }
+    .dp-pill { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 999px; font-size: 10px; background: rgba(255,255,255,.2); color: #fff; }
+    .dp-pill svg { width: 9px; height: 9px; }
+    .chat-input-wrap { margin: 0 14px 14px; display: flex; align-items: flex-end; gap: 8px; background: var(--inset); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; }
+    #chatInput { flex: 1; resize: none; border: none; outline: none; background: transparent; font-size: 13px; color: var(--t1); line-height: 1.5; font-family: inherit; max-height: 120px; }
+    #chatSend { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--brand); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity .12s; }
+    #chatSend svg { width: 13px; height: 13px; stroke: #fff; }
+    #chatSend:disabled { opacity: .35; cursor: default; }
+    @keyframes tp { 0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)} }
+    .td { width: 5px; height: 5px; border-radius: 50%; background: var(--t3); animation: tp 1.2s ease-in-out infinite; }
+    .td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+    .typing-wrap { display: inline-flex; align-items: center; gap: 3px; padding: 4px 6px; }
+
+    /* ── SAVED PAGE ── */
+    .saved-group { margin-bottom: 28px; }
+    .saved-group-hd { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 10px; }
+    .saved-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .saved-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .sc-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .sc-badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; }
+    .sc-title { font-size: 13px; font-weight: 600; color: var(--t1); line-height: 1.4; }
+    .sc-src   { font-size: 11px; color: var(--t3); }
+    .sc-body  { font-size: 12px; line-height: 1.6; color: #4b5563; }
+    .sc-tags  { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+    .sc-tag   { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--inset); border: 1px solid var(--border); color: var(--t2); }
+    .rm-btn { width: 24px; height: 24px; border-radius: 50%; border: none; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .rm-btn svg { width: 12px; height: 12px; stroke: var(--t3); transition: stroke .12s; }
+    .rm-btn:hover svg { stroke: var(--brand); }
+
+    /* ── PROFILE PAGE ── */
+    .profile-card { max-width: 500px; }
+    .form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .form-label { font-size: 12px; font-weight: 500; color: var(--t2); }
+    .form-input { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; color: var(--t1); outline: none; background: #fff; transition: border-color .12s; }
+    .form-input:focus { border-color: var(--brand); }
+    select.form-input { cursor: pointer; }
+    .save-confirm { font-size: 12px; color: #16a34a; margin-left: 10px; opacity: 0; transition: opacity .2s; }
+    .save-confirm.show { opacity: 1; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 52px 0; }
+    .empty-state p { font-size: 13px; color: var(--t3); margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="show('dashboard')">r<em>o</em>mi</div>
+    <div class="nav-links">
+      <button class="nav-btn active" data-p="dashboard"  onclick="show('dashboard')">Dashboard</button>
+      <button class="nav-btn"        data-p="ai"         onclick="show('ai')">AI Concierge</button>
+      <button class="nav-btn"        data-p="profile"    onclick="show('profile')">Profile</button>
+      <button class="nav-btn"        data-p="saved"      onclick="show('saved')">Saved</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
+  <div id="page-dashboard" class="page active">
+    <div class="ph"><h1>Dashboard</h1><p>Your menopause health overview.</p></div>
+
+    <div class="grid2" style="margin-bottom:14px;align-items:start">
+
+      <!-- Resources widget (LEFT) -->
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-hd-l">
+            <div class="hd-icon"><i data-lucide="book-open"></i></div>
+            <div class="hd-title">Resources</div>
+          </div>
+          <div class="card-hd-r">
+            <button class="btn-icon" id="resRefreshBtn" onclick="refreshResWidget()" title="Refresh"><i data-lucide="refresh-cw"></i></button>
+            <button class="link-s" onclick="show('saved')">Saved →</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="res-list" id="resWidgetList"></div>
+        </div>
+      </div>
+
+      <!-- Doctor Questions widget (RIGHT) -->
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-hd-l">
+            <div class="hd-icon"><i data-lucide="stethoscope"></i></div>
+            <div class="hd-title">Doctor Questions</div>
+          </div>
+          <div class="card-hd-r">
+            <button class="btn-icon" id="qRefreshBtn" onclick="refreshQuestions()" title="New questions"><i data-lucide="refresh-cw"></i></button>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" id="copyQsBtn" onclick="copyQs()">
+              <i data-lucide="copy"></i> Copy
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="qList"></div>
+          <div class="q-add">
+            <input type="text" id="qNewInput" placeholder="Add your own question..." onkeydown="if(event.key==='Enter')addQuestion()" />
+            <button class="btn btn-brand" style="padding:5px 12px;font-size:12px" onclick="addQuestion()">
+              <i data-lucide="plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis widget (full width) -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-hd-l">
+          <div class="hd-icon"><i data-lucide="bar-chart-2"></i></div>
+          <div class="hd-title">Analysis</div>
+        </div>
+      </div>
+      <div class="card-body" id="analysisBody">
+        <div class="empty-state"><p>Start chatting with your AI Concierge to see your analysis.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ AI CONCIERGE ═══════════════ -->
+  <div id="page-ai" class="page">
+    <div class="ai-wrap">
+      <div class="ph">
+        <h1>AI Concierge</h1>
+        <p>Journal freely — I'll track your symptoms and answer your menopause questions.</p>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-hd-l">
+            <div class="hd-icon"><i data-lucide="message-circle"></i></div>
+            <div>
+              <div class="hd-title">romi</div>
+              <div class="hd-sub">Symptom tracking enabled</div>
+            </div>
+          </div>
+          <div class="badge-beta"><i data-lucide="sparkles"></i> Beta</div>
+        </div>
+        <div class="chat-msgs" id="chatMsgs"></div>
+        <div class="chat-input-wrap">
+          <textarea id="chatInput" rows="2" placeholder="How are you feeling today? Journal freely..."></textarea>
+          <button id="chatSend" disabled onclick="sendChat()"><i data-lucide="send"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PROFILE ═══════════════ -->
+  <div id="page-profile" class="page">
+    <div class="ph"><h1>Profile</h1><p>Your health profile.</p></div>
+    <div class="card profile-card">
+      <div class="card-body">
+        <div class="form-field">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" id="profileName" placeholder="Your first name" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Age range</label>
+          <select class="form-input" id="profileAge">
+            <option value="">Select...</option>
+            <option>Under 40</option>
+            <option>40–44</option>
+            <option>45–49</option>
+            <option>50–54</option>
+            <option>55–59</option>
+            <option>60+</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Menopause stage</label>
+          <select class="form-input" id="profileStage">
+            <option value="">Select...</option>
+            <option>Perimenopause</option>
+            <option>Menopause</option>
+            <option>Post-menopause</option>
+            <option>Not sure</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Primary concern</label>
+          <select class="form-input" id="profileConcern">
+            <option value="">Select...</option>
+            <option>Hot flashes &amp; night sweats</option>
+            <option>Sleep disruption</option>
+            <option>Mood &amp; anxiety</option>
+            <option>Brain fog &amp; cognition</option>
+            <option>Weight &amp; metabolism</option>
+            <option>Joint pain</option>
+            <option>General tracking</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center">
+          <button class="btn btn-brand" onclick="saveProfile()">Save profile</button>
+          <span class="save-confirm" id="profileSaved">Saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SAVED ═══════════════ -->
+  <div id="page-saved" class="page">
+    <div class="ph"><h1>Saved</h1><p>Your saved resources, organized by category.</p></div>
+    <div id="savedBody"></div>
+  </div>
+
+</main>
+
+<script>
+// ═══════ DATA ═══════
+const SYMPTOMS = [
+  { id:'hot_flashes',    label:'Hot Flashes',       icon:'flame',         cat:'Vasomotor'      },
+  { id:'night_sweats',   label:'Night Sweats',       icon:'droplets',      cat:'Vasomotor'      },
+  { id:'sleep',          label:'Sleep Disturbances', icon:'moon',          cat:'Sleep & Energy' },
+  { id:'fatigue',        label:'Fatigue',            icon:'zap',           cat:'Sleep & Energy' },
+  { id:'mood_swings',    label:'Mood Swings',        icon:'arrow-up-down', cat:'Mood'           },
+  { id:'anxiety',        label:'Anxiety',            icon:'wind',          cat:'Mood'           },
+  { id:'brain_fog',      label:'Brain Fog',          icon:'cloud',         cat:'Cognitive'      },
+  { id:'concentration',  label:'Concentration',      icon:'target',        cat:'Cognitive'      },
+  { id:'joint_pain',     label:'Joint Pain',         icon:'activity',      cat:'Physical'       },
+  { id:'headaches',      label:'Headaches',          icon:'zap-off',       cat:'Physical'       },
+  { id:'weight_changes', label:'Weight Changes',     icon:'scale',         cat:'Physical'       },
+  { id:'skin_changes',   label:'Skin Changes',       icon:'sparkles',      cat:'Physical'       },
+];
+
+const SYM_KEYWORDS = {
+  hot_flashes:   ['hot flash','hot flashes','flushing','flush','heat wave'],
+  night_sweats:  ['night sweat','night sweats','sweating at night','soaked'],
+  sleep:         ["can't sleep",'insomnia','trouble sleeping','woke up','wake up','sleepless','restless','sleep'],
+  fatigue:       ['tired','fatigue','exhausted','no energy','drained','sluggish'],
+  mood_swings:   ['mood','irritable','emotional','mood swing','snapped','crying','tearful'],
+  anxiety:       ['anxious','anxiety','nervous','worry','worried','on edge'],
+  brain_fog:     ['brain fog','foggy','memory','forgetful',"can't remember",'fuzzy'],
+  concentration: ["can't concentrate",'focus','distracted','zoning out'],
+  joint_pain:    ['joint pain','aching','stiff','stiffness','achy'],
+  headaches:     ['headache','head pain','migraine'],
+  weight_changes:['weight','gained weight','bloated'],
+  skin_changes:  ['dry skin','itchy skin','tingling'],
+};
+
+const MOOD_LABEL = { 1:'Rough', 2:'Low', 3:'Okay', 4:'Good', 5:'Great' };
+
+const RESOURCES = [
+  { id:1, cat:'research',  title:'Understanding Hot Flashes: Triggers and Management',         src:'PubMed · NEJM',             time:'5 min', tags:['Hot Flashes','Vasomotor'],  url:'https://pubmed.ncbi.nlm.nih.gov/?term=hot+flashes+menopause+management',         summary:'Hot flashes affect up to 75% of menopausal women. This review covers thermoregulatory mechanisms and evidence-based interventions including CBT, SSRIs, and phytoestrogens.' },
+  { id:2, cat:'relief',    title:'Cooling Strategies That Actually Work at Night',              src:'Menopause Society',          time:'4 min', tags:['Night Sweats','Sleep'],      url:'https://www.menopause.org/for-women/sexual-health-menopause-online/causes-of-sexual-problems/night-sweats', summary:'Evidence-based tips for managing night sweats: moisture-wicking fabrics, bedroom temperature, and the effectiveness of cooling mattress toppers.' },
+  { id:3, cat:'research',  title:'Hormonal Changes and Brain Fog During Perimenopause',        src:'PubMed · Neurology',         time:'6 min', tags:['Brain Fog','Cognitive'],     url:'https://pubmed.ncbi.nlm.nih.gov/?term=menopause+cognitive+function+brain+fog',   summary:'Estrogen plays a key role in cognitive function. Verbal memory and processing speed often dip during the menopause transition and typically improve post-menopause.' },
+  { id:4, cat:'lifestyle', title:'Exercise as Medicine: How Strength Training Helps',          src:'Mayo Clinic',                time:'5 min', tags:['Exercise','Mood'],           url:'https://www.mayoclinic.org/healthy-lifestyle/womens-health/in-depth/menopause/art-20048432', summary:'Regular resistance training reduces vasomotor symptoms, improves bone density, supports weight management, and significantly improves mood and sleep quality.' },
+  { id:5, cat:'mental',    title:"Anxiety and Menopause: What's the Link?",                    src:'Harvard Health',             time:'7 min', tags:['Anxiety','Mood'],            url:'https://www.health.harvard.edu/womens-health/menopause-and-mental-health',        summary:'Many women experience anxiety for the first time during perimenopause. Learn about hormonal roots and approaches including mindfulness, CBT, and medication.' },
+  { id:6, cat:'research',  title:'Phytoestrogens: What the Research Actually Says',             src:'PubMed · Climacteric',       time:'5 min', tags:['Natural Remedies'],          url:'https://pubmed.ncbi.nlm.nih.gov/?term=phytoestrogens+menopause+meta-analysis',   summary:'A meta-analysis of 62 trials found modest but meaningful reduction in hot flash frequency with soy isoflavones and other phytoestrogens.' },
+  { id:7, cat:'lifestyle', title:'Nutrition for Menopause: Foods That Help',                   src:'British Menopause Society',  time:'6 min', tags:['Nutrition','Diet'],          url:'https://thebms.org.uk/publications/tools-for-clinicians/diet-and-menopause/',    summary:'A Mediterranean-style diet rich in calcium, vitamin D, and omega-3s is associated with fewer symptoms and better long-term bone and cardiovascular health.' },
+  { id:8, cat:'mental',    title:'Sleep Hygiene in Menopause: A Practical Guide',              src:'Sleep Foundation',           time:'8 min', tags:['Sleep','CBT-I'],             url:'https://www.sleepfoundation.org/women-sleep/menopause-and-sleep',                 summary:'CBT-I techniques and evidence for magnesium, melatonin, and valerian root for menopause-related sleep disruption.' },
+];
+
+const CAT_CONFIG = {
+  relief:    { label:'Relief',      color:'#e0457b' },
+  research:  { label:'Research',    color:'#7c6af7' },
+  lifestyle: { label:'Lifestyle',   color:'#0ea5e9' },
+  mental:    { label:'Mind & Mood', color:'#f59e0b' },
+};
+
+const ALL_QS = [
+  'Am I in perimenopause or menopause?',
+  'What hormone therapy options are right for me?',
+  'What screenings should I have at this stage?',
+  'How long will my symptoms typically last?',
+  'Are my symptoms within the normal range?',
+  'What are the risks of hormone therapy for me?',
+  'How can I manage hot flashes without medication?',
+  'Should I be concerned about bone density?',
+  'What can I do about brain fog and memory issues?',
+  'Is my sleep disruption related to hormones?',
+  'Are there non-hormonal treatments for my symptoms?',
+  'How does menopause affect cardiovascular health?',
+  'What supplements are actually evidence-based?',
+  'Can I still get pregnant in perimenopause?',
+  'How do I know if my mood changes are hormonal or depression?',
+  'What is my risk for osteoporosis?',
+  'How does weight gain relate to menopause?',
+  'Should I be getting a bone density scan?',
+  'What lifestyle changes will make the biggest difference?',
+  'Are my symptoms severe enough to consider medication?',
+];
+
+// ═══════ STORAGE ═══════
+const getLogs    = () => { try { return JSON.parse(localStorage.getItem('romi_logs')   ||'[]');   } catch { return [];   } };
+const getChat    = () => { try { return JSON.parse(localStorage.getItem('romi_chat')   ||'[]');   } catch { return [];   } };
+const getDoctorQs= () => { try { return JSON.parse(localStorage.getItem('romi_qs')    ||'null'); } catch { return null; } };
+const getSaved   = () => { try { return JSON.parse(localStorage.getItem('romi_saved') ||'[]');   } catch { return [];   } };
+const getProfile = () => { try { return JSON.parse(localStorage.getItem('romi_profile')||'{}');  } catch { return {};   } };
+
+function saveLog(log)    { const l=getLogs(); l.unshift(log); localStorage.setItem('romi_logs', JSON.stringify(l)); }
+function saveChat(m)     { localStorage.setItem('romi_chat', JSON.stringify(m)); }
+function saveDoctorQs(q) { localStorage.setItem('romi_qs',   JSON.stringify(q)); }
+
+// ═══════ ROUTING ═══════
+function show(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelector(`.nav-btn[data-p="${p}"]`)?.classList.add('active');
+  if (p === 'dashboard') { initAnalysis(); initQs(); renderResWidget(); }
+  if (p === 'ai')        { renderChat(); }
+  if (p === 'saved')     { initSaved(); }
+  if (p === 'profile')   { loadProfile(); }
+  lucide.createIcons();
+  window.scrollTo(0, 0);
+}
+
+// ═══════ RESOURCES WIDGET ═══════
+let currentResIds = [];
+
+function bookmarkSvg(saved) {
+  const c = saved ? 'var(--brand)' : '#9ca3af';
+  const f = saved ? 'var(--brand)' : 'none';
+  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="${f}" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>`;
+}
+
+function pickRandomResources() {
+  const shuffled = [...RESOURCES].sort(() => Math.random() - .5);
+  currentResIds = shuffled.slice(0, 4).map(r => r.id);
+}
+
+function renderResWidget() {
+  if (!currentResIds.length) pickRandomResources();
+  const saved = getSaved();
+  const list = document.getElementById('resWidgetList');
+  if (!list) return;
+
+  list.innerHTML = currentResIds.map(id => {
+    const r = RESOURCES.find(x => x.id === id);
+    if (!r) return '';
+    const cc = CAT_CONFIG[r.cat];
+    const isSaved = saved.includes(r.id);
+    return `<div class="res-item">
+      <div class="res-item-body">
+        <a href="${r.url}" target="_blank" rel="noopener" class="res-item-title res-link">${escHtml(r.title)}</a>
+        <div class="res-item-meta">
+          <span class="cat-dot" style="background:${cc.color}"></span>
+          <span>${cc.label}</span>
+          <span style="color:var(--border)">·</span>
+          <span>${r.src}</span>
+          <span style="color:var(--border)">·</span>
+          <span>${r.time} read</span>
+        </div>
+      </div>
+      <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSaveRes(${r.id})" title="${isSaved ? 'Remove from saved' : 'Save to collection'}">
+        ${bookmarkSvg(isSaved)}
+      </button>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function refreshResWidget() {
+  pickRandomResources();
+  renderResWidget();
+  const btn = document.getElementById('resRefreshBtn');
+  if (btn) { btn.classList.add('spinning'); setTimeout(() => btn.classList.remove('spinning'), 450); }
+}
+
+function toggleSaveRes(id) {
+  const saved = getSaved();
+  const idx = saved.indexOf(id);
+  if (idx >= 0) saved.splice(idx, 1); else saved.unshift(id);
+  localStorage.setItem('romi_saved', JSON.stringify(saved));
+  renderResWidget();
+  if (document.getElementById('page-saved').classList.contains('active')) initSaved();
+}
+
+// ═══════ DOCTOR QUESTIONS ═══════
+function pickRandomQs() {
+  return [...ALL_QS].sort(() => Math.random() - .5).slice(0, 5)
+    .map((t, i) => ({ id: 'q' + Date.now() + i, text: t, checked: false }));
+}
+
+function initQs() {
+  let qs = getDoctorQs();
+  if (!qs) { qs = pickRandomQs(); saveDoctorQs(qs); }
+  renderQs(qs);
+}
+
+function renderQs(qs) {
+
+  const list = document.getElementById('qList');
+  if (!list) return;
+  list.innerHTML = qs.map(q => `
+    <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="${escHtml(q.text)}">
+      <span class="q-arrow"><i data-lucide="arrow-right"></i></span>
+      <span class="q-txt">${escHtml(q.text)}</span>
+    </div>`).join('');
+  lucide.createIcons();
+}
+
+function toggleQ(id) {
+  const qs = getDoctorQs() || [];
+  const q = qs.find(x => x.id === id);
+  if (q) { q.checked = !q.checked; saveDoctorQs(qs); renderQs(qs); }
+}
+
+function addQuestion() {
+  const inp = document.getElementById('qNewInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  const qs = getDoctorQs() || [];
+  qs.push({ id: 'c' + Date.now(), text, checked: false });
+  saveDoctorQs(qs); renderQs(qs); inp.value = '';
+}
+
+function copyQs() {
+  const qs = getDoctorQs() || [];
+  navigator.clipboard.writeText(qs.map((q, i) => `${i + 1}. ${q.text}`).join('\n'));
+  const btn = document.getElementById('copyQsBtn');
+  const orig = btn.innerHTML;
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.innerHTML = orig; lucide.createIcons(); }, 2000);
+}
+
+function refreshQuestions() {
+  const qs = pickRandomQs();
+  saveDoctorQs(qs);
+  renderQs(qs);
+  const btn = document.getElementById('qRefreshBtn');
+  if (btn) { btn.classList.add('spinning'); setTimeout(() => btn.classList.remove('spinning'), 450); }
+}
+
+function askDoctorQuestion(text) {
+  show('ai');
+  setTimeout(() => {
+    const inp = document.getElementById('chatInput');
+    if (inp) {
+      inp.value = text;
+      document.getElementById('chatSend').disabled = false;
+      sendChat();
+    }
+  }, 160);
+}
+
+// ═══════ AI CONCIERGE ═══════
+const WELCOME = {
+  role: 'ai',
+  text: "Hi, I'm romi. Tell me how you're feeling — I'll track any symptoms you mention and answer your questions about menopause.",
+  t: new Date().toISOString()
+};
+
+function renderChat() {
+  const container = document.getElementById('chatMsgs');
+  if (!container) return;
+  container.innerHTML = '';
+  const msgs = getChat();
+  (msgs.length ? msgs : [WELCOME]).slice(-14).forEach(m => appendBubble(m));
+}
+
+function appendBubble(msg) {
+  const c = document.getElementById('chatMsgs');
+  if (!c) return;
+  const div = document.createElement('div');
+  div.className = 'msg ' + msg.role;
+  let inner = `<div class="bubble">${escHtml(msg.text)}`;
+  if (msg.detected && msg.detected.length) {
+    inner += `<div class="dp-pills">`;
+    msg.detected.forEach(id => {
+      const s = SYMPTOMS.find(x => x.id === id);
+      if (s) inner += `<span class="dp-pill"><i data-lucide="${s.icon}"></i>${s.label}</span>`;
+    });
+    inner += `</div>`;
+  }
+  inner += `</div>`;
+  div.innerHTML = inner;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+function showTyping() {
+  const c = document.getElementById('chatMsgs');
+  if (!c) return null;
+  const d = document.createElement('div');
+  d.className = 'msg ai'; d.id = 'typing-indicator';
+  d.innerHTML = `<div class="bubble"><div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  return d;
+}
+
+function detectSymptoms(txt) {
+  const lower = txt.toLowerCase();
+  return SYMPTOMS.filter(s => (SYM_KEYWORDS[s.id] || []).some(kw => lower.includes(kw))).map(s => s.id);
+}
+
+function getSessionId() {
+  let id = localStorage.getItem('romi_session');
+  if (!id) {
+    id = 'romi_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    localStorage.setItem('romi_session', id);
+  }
+  return id;
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  document.getElementById('chatSend').disabled = true;
+
+  const detected = detectSymptoms(text);
+  const userMsg = { role: 'user', text, detected, t: new Date().toISOString() };
+
+  const msgs = getChat().length ? getChat() : [WELCOME];
+  msgs.push(userMsg);
+  saveChat(msgs);
+  appendBubble(userMsg);
+
+  if (detected.length) {
+    saveLog({
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      symptoms: detected.map(id => ({ symptomId: id, severity: 5 })),
+      notes: text,
+      mood: 3
+    });
+  }
+
+  const td = showTyping();
+  let resp;
+  try {
+    const res = await fetch('https://samashah.app.n8n.cloud/webhook/romichat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatInput: text, sessionId: getSessionId() })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const data = await res.json();
+      resp = data.output ?? data.text ?? data.message ?? data.response ?? JSON.stringify(data);
+    } else {
+      resp = await res.text();
+    }
+  } catch (err) {
+    resp = "I'm having trouble connecting right now. Please try again in a moment.";
+  }
+
+  if (td) td.remove();
+
+  const aiMsg = { role: 'ai', text: String(resp), t: new Date().toISOString() };
+  msgs.push(aiMsg);
+  saveChat(msgs);
+  appendBubble(aiMsg);
+  lucide.createIcons();
+}
+
+// ═══════ ANALYSIS ═══════
+let homeChart = null;
+function initAnalysis() {
+  const logs = getLogs();
+  const body = document.getElementById('analysisBody');
+  if (!body) return;
+
+  const week = logs.filter(l => new Date(l.date) >= new Date(Date.now() - 7 * 864e5));
+  const avgMood = week.length ? (week.reduce((s, l) => s + l.mood, 0) / week.length).toFixed(1) : '—';
+  const recent = logs.slice(0, 7).reverse();
+  const delta = recent.length >= 2 ? recent[recent.length - 1].mood - recent[0].mood : 0;
+  const trend = delta > 0 ? '↑ Improving' : delta < 0 ? '↓ Declining' : logs.length ? '→ Stable' : '';
+  const trendColor = delta > 0 ? '#16a34a' : delta < 0 ? 'var(--brand)' : 'var(--t3)';
+
+  const counts = {};
+  week.forEach(l => l.symptoms.forEach(s => counts[s.symptomId] = (counts[s.symptomId] || 0) + 1));
+  const topSyms = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  const maxCount = topSyms[0] ? topSyms[0][1] : 1;
+  const totalSyms = logs.reduce((s, l) => s + l.symptoms.length, 0);
+
+  let html = `<div class="stat-row">
+    <div class="stat-box"><div class="stat-lbl">Days tracked</div><div class="stat-val">${logs.length || '—'}</div></div>
+    <div class="stat-box"><div class="stat-lbl">Avg mood</div><div class="stat-val">${avgMood}</div>${trend ? `<div class="stat-detail" style="color:${trendColor}">${trend}</div>` : ''}</div>
+    <div class="stat-box"><div class="stat-lbl">Symptoms logged</div><div class="stat-val">${totalSyms || '—'}</div></div>
+  </div>`;
+
+  html += `<div class="chart-wrap"><div class="section-lbl">Mood — last 7 entries</div>`;
+  if (recent.length >= 3) {
+    html += `<canvas id="homeChart" height="44"></canvas>`;
+  } else {
+    html += `<div style="height:44px;background:var(--inset);border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;color:var(--t3)">No data yet</span></div>`;
+  }
+  html += `</div>`;
+
+  html += `<div class="section-lbl" style="margin-top:8px">Top symptoms this week</div>`;
+  if (topSyms.length) {
+    topSyms.forEach(([id, cnt]) => {
+      const s = SYMPTOMS.find(x => x.id === id);
+      if (!s) return;
+      const pct = Math.round((cnt / maxCount) * 100);
+      html += `<div class="sym-row"><i data-lucide="${s.icon}"></i><span class="sym-lbl">${s.label}</span>
+        <div class="sym-bar-track"><div class="sym-bar-fill" style="width:${pct}%"></div></div>
+        <span class="sym-cnt">${cnt}×</span></div>`;
+    });
+  } else {
+    ['Hot Flashes', 'Night Sweats', 'Fatigue'].forEach(name => {
+      html += `<div class="sym-row" style="opacity:.35">
+        <div style="width:12px;height:12px;background:var(--border);border-radius:2px;flex-shrink:0"></div>
+        <span class="sym-lbl">${name}</span>
+        <div class="sym-bar-track"><div class="sym-bar-fill" style="width:0%"></div></div>
+        <span class="sym-cnt">—</span></div>`;
+    });
+  }
+
+  body.innerHTML = html;
+  lucide.createIcons();
+
+  if (recent.length >= 3) {
+    if (homeChart) homeChart.destroy();
+    const ctx = document.getElementById('homeChart')?.getContext('2d');
+    if (ctx) homeChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: recent.map(() => ''),
+        datasets: [{ data: recent.map(l => l.mood), borderColor: '#e0457b', borderWidth: 2, pointRadius: 0, tension: .4, fill: false }]
+      },
+      options: {
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: v => MOOD_LABEL[v.raw] || v.raw } } },
+        scales: { x: { display: false }, y: { display: false, min: 1, max: 5 } },
+        animation: { duration: 400 }
+      }
+    });
+  }
+}
+
+// ═══════ SAVED PAGE ═══════
+function initSaved() {
+  const saved = getSaved();
+  const body = document.getElementById('savedBody');
+  if (!body) return;
+
+  if (!saved.length) {
+    body.innerHTML = '<div class="empty-state"><p>No saved resources yet.</p><p>Bookmark resources on the Dashboard to build your collection.</p></div>';
+    return;
+  }
+
+  const groups = {};
+  saved.forEach(id => {
+    const r = RESOURCES.find(x => x.id === id);
+    if (!r) return;
+    if (!groups[r.cat]) groups[r.cat] = [];
+    groups[r.cat].push(r);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([cat, items]) => {
+    const cc = CAT_CONFIG[cat];
+    html += `<div class="saved-group">
+      <div class="saved-group-hd" style="color:${cc.color}">${cc.label}</div>
+      <div class="saved-grid">`;
+    items.forEach(r => {
+      html += `<div class="saved-card">
+        <div class="sc-meta">
+          <span class="sc-badge" style="background:${cc.color}14;color:${cc.color}">${cc.label}</span>
+          <button class="rm-btn" onclick="toggleSaveRes(${r.id})" title="Remove"><i data-lucide="x"></i></button>
+        </div>
+        <a href="${r.url}" target="_blank" rel="noopener" class="sc-title res-link">${escHtml(r.title)}</a>
+        <div class="sc-src">${r.src} · ${r.time} read</div>
+        <div class="sc-body">${r.summary}</div>
+        <div class="sc-tags">${r.tags.map(t => `<span class="sc-tag">${t}</span>`).join('')}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  body.innerHTML = html;
+  lucide.createIcons();
+}
+
+// ═══════ PROFILE ═══════
+function loadProfile() {
+  const p = getProfile();
+  const fields = ['profileName', 'profileAge', 'profileStage', 'profileConcern'];
+  const keys   = ['name', 'age', 'stage', 'concern'];
+  fields.forEach((f, i) => {
+    const el = document.getElementById(f);
+    if (el) el.value = p[keys[i]] || '';
+  });
+}
+
+function saveProfile() {
+  localStorage.setItem('romi_profile', JSON.stringify({
+    name:    document.getElementById('profileName')?.value    || '',
+    age:     document.getElementById('profileAge')?.value     || '',
+    stage:   document.getElementById('profileStage')?.value   || '',
+    concern: document.getElementById('profileConcern')?.value || '',
+  }));
+  const conf = document.getElementById('profileSaved');
+  if (conf) { conf.classList.add('show'); setTimeout(() => conf.classList.remove('show'), 2500); }
+}
+
+// ═══════ UTILS ═══════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════ BOOT ═══════
+document.addEventListener('DOMContentLoaded', () => {
+  pickRandomResources();
+  renderResWidget();
+  initQs();
+  initAnalysis();
+
+  // Chat input listeners — attached once
+  const inp = document.getElementById('chatInput');
+  if (inp) {
+    inp.addEventListener('input', function () {
+      document.getElementById('chatSend').disabled = !this.value.trim();
+    });
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+    });
+  }
+
+  lucide.createIcons();
+});
+</script>
+</body>
+</html>
