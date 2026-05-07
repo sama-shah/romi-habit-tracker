@@ -532,7 +532,8 @@ function pickRandomQs() {
 
 function initQs() {
   let qs = getDoctorQs();
-  if (!qs) {
+  const valid = qs && Array.isArray(qs) && qs.length > 0 && qs.every(q => q.text);
+  if (!valid) {
     qs = BASE_QS.map((t, i) => ({ id: 'q' + i, text: t }));
     saveDoctorQs(qs);
   }
@@ -543,12 +544,12 @@ function renderQs(qs) {
 
   const list = document.getElementById('qList');
   if (!list) return;
+  const arrowSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
   list.innerHTML = qs.map(q => `
     <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="${escHtml(q.text)}">
-      <span class="q-arrow"><i data-lucide="arrow-right"></i></span>
+      <span class="q-arrow">${arrowSvg}</span>
       <span class="q-txt">${escHtml(q.text)}</span>
     </div>`).join('');
-  lucide.createIcons();
 }
 
 function toggleQ(id) {
