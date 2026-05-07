@@ -237,7 +237,13 @@
           </div>
         </div>
         <div class="card-body">
-          <div id="qList"></div>
+          <div id="qList">
+            <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="Am I in perimenopause or menopause?"><span class="q-arrow"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span class="q-txt">Am I in perimenopause or menopause?</span></div>
+            <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="What hormone therapy options are right for me?"><span class="q-arrow"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span class="q-txt">What hormone therapy options are right for me?</span></div>
+            <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="What screenings should I have at this stage?"><span class="q-arrow"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span class="q-txt">What screenings should I have at this stage?</span></div>
+            <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="How long will my symptoms typically last?"><span class="q-arrow"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span class="q-txt">How long will my symptoms typically last?</span></div>
+            <div class="q-row" onclick="askDoctorQuestion(this.dataset.text)" data-text="Are my symptoms within the normal range?"><span class="q-arrow"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span class="q-txt">Are my symptoms within the normal range?</span></div>
+          </div>
           <div class="q-add">
             <input type="text" id="qNewInput" placeholder="Add your own question..." onkeydown="if(event.key==='Enter')addQuestion()" />
             <button class="btn btn-brand" style="padding:5px 12px;font-size:12px" onclick="addQuestion()">
@@ -749,6 +755,12 @@ function initAnalysis() {
   const body = document.getElementById('analysisBody');
   if (!body) return;
 
+  if (!logs.length) {
+    if (homeChart) { homeChart.destroy(); homeChart = null; }
+    body.innerHTML = '<div class="empty-state"><p>Start chatting with your AI Concierge to see your analysis.</p></div>';
+    return;
+  }
+
   const week = logs.filter(l => new Date(l.date) >= new Date(Date.now() - 7 * 864e5));
   const avgMood = week.length ? (week.reduce((s, l) => s + l.mood, 0) / week.length).toFixed(1) : '—';
   const recent = logs.slice(0, 7).reverse();
@@ -787,13 +799,7 @@ function initAnalysis() {
         <span class="sym-cnt">${cnt}×</span></div>`;
     });
   } else {
-    ['Hot Flashes', 'Night Sweats', 'Fatigue'].forEach(name => {
-      html += `<div class="sym-row" style="opacity:.35">
-        <div style="width:12px;height:12px;background:var(--border);border-radius:2px;flex-shrink:0"></div>
-        <span class="sym-lbl">${name}</span>
-        <div class="sym-bar-track"><div class="sym-bar-fill" style="width:0%"></div></div>
-        <span class="sym-cnt">—</span></div>`;
-    });
+    html += `<div style="font-size:12px;color:var(--t3);padding:6px 0">No symptoms logged this week.</div>`;
   }
 
   body.innerHTML = html;
