@@ -65,7 +65,7 @@
     .btn-ghost { background: var(--inset); color: var(--t2); border: 1px solid var(--border); }
     .btn-ghost:hover { background: #eff1f4; }
     .btn-icon { width: 28px; height: 28px; padding: 0; border-radius: 50%; background: var(--inset); border: 1px solid var(--border); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .12s; }
-    .btn-icon svg { width: 12px; height: 12px; stroke: var(--t3); }
+    .btn-icon svg { width: 13px; height: 13px; stroke: var(--t2); }
     .btn-icon:hover { background: #eff1f4; }
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     .spinning { animation: spin .45s ease; }
@@ -165,6 +165,19 @@
     .save-confirm { font-size: 12px; color: #16a34a; margin-left: 10px; opacity: 0; transition: opacity .2s; }
     .save-confirm.show { opacity: 1; }
 
+    /* HISTORY */
+    .history-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--t3); background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit; transition: color .12s; }
+    .history-toggle:hover { color: var(--t2); }
+    .history-chevron { transition: transform .2s; }
+    .history-chevron.open { transform: rotate(180deg); }
+    .history-body { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
+    .hist-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
+    .hist-date { font-size: 11px; color: var(--t3); margin-bottom: 6px; }
+    .hist-msg { font-size: 12px; line-height: 1.5; margin-bottom: 3px; }
+    .hist-msg.user { color: var(--t2); }
+    .hist-msg.ai   { color: var(--t1); }
+    .hist-msg .role { font-weight: 600; margin-right: 4px; }
+
     /* EMPTY STATE */
     .empty-state { text-align: center; padding: 52px 0; }
     .empty-state p { font-size: 13px; color: var(--t3); margin-bottom: 4px; }
@@ -200,7 +213,7 @@
             <div class="hd-title">Resources</div>
           </div>
           <div class="card-hd-r">
-            <button class="btn-icon" id="resRefreshBtn" onclick="refreshResWidget()" title="Refresh"><i data-lucide="refresh-cw"></i></button>
+            <button class="btn-icon" id="resRefreshBtn" onclick="refreshResWidget()" title="Refresh"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
             <button class="link-s" onclick="show('saved')">Saved →</button>
           </div>
         </div>
@@ -217,7 +230,7 @@
             <div class="hd-title">Doctor Questions</div>
           </div>
           <div class="card-hd-r">
-            <button class="btn-icon" id="qRefreshBtn" onclick="refreshQuestions()" title="New questions"><i data-lucide="refresh-cw"></i></button>
+            <button class="btn-icon" id="qRefreshBtn" onclick="refreshQuestions()" title="New questions"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
             <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" id="copyQsBtn" onclick="copyQs()">
               <i data-lucide="copy"></i> Copy
             </button>
@@ -272,6 +285,16 @@
           <textarea id="chatInput" rows="2" placeholder="How are you feeling today? Journal freely..."></textarea>
           <button id="chatSend" disabled onclick="sendChat()"><i data-lucide="send"></i></button>
         </div>
+      </div>
+
+      <!-- History -->
+      <div style="margin-top:14px">
+        <button class="history-toggle" onclick="toggleHistory()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Chat history
+          <svg class="history-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="history-body" id="historyBody" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -388,12 +411,16 @@ const CAT_CONFIG = {
   mental:    { label:'Mind & Mood', color:'#f59e0b' },
 };
 
-const ALL_QS = [
+const BASE_QS = [
   'Am I in perimenopause or menopause?',
   'What hormone therapy options are right for me?',
   'What screenings should I have at this stage?',
   'How long will my symptoms typically last?',
   'Are my symptoms within the normal range?',
+];
+
+const ALL_QS = [
+  ...BASE_QS,
   'What are the risks of hormone therapy for me?',
   'How can I manage hot flashes without medication?',
   'Should I be concerned about bone density?',
@@ -412,15 +439,15 @@ const ALL_QS = [
 ];
 
 // ═══════ STORAGE ═══════
-const getLogs    = () => { try { return JSON.parse(localStorage.getItem('romi_logs')   ||'[]');   } catch { return [];   } };
-const getChat    = () => { try { return JSON.parse(localStorage.getItem('romi_chat')   ||'[]');   } catch { return [];   } };
-const getDoctorQs= () => { try { return JSON.parse(localStorage.getItem('romi_qs')    ||'null'); } catch { return null; } };
-const getSaved   = () => { try { return JSON.parse(localStorage.getItem('romi_saved') ||'[]');   } catch { return [];   } };
-const getProfile = () => { try { return JSON.parse(localStorage.getItem('romi_profile')||'{}');  } catch { return {};   } };
+const getLogs      = () => { try { return JSON.parse(localStorage.getItem('romi_logs')   ||'[]');   } catch { return [];   } };
+const getDoctorQs  = () => { try { return JSON.parse(localStorage.getItem('romi_qs')    ||'null'); } catch { return null; } };
+const getSaved     = () => { try { return JSON.parse(localStorage.getItem('romi_saved') ||'[]');   } catch { return [];   } };
+const getProfile   = () => { try { return JSON.parse(localStorage.getItem('romi_profile')||'{}');  } catch { return {};   } };
+const getChatHistory=()=>{ try { return JSON.parse(localStorage.getItem('romi_history')||'[]');  } catch { return [];   } };
 
-function saveLog(log)    { const l=getLogs(); l.unshift(log); localStorage.setItem('romi_logs', JSON.stringify(l)); }
-function saveChat(m)     { localStorage.setItem('romi_chat', JSON.stringify(m)); }
-function saveDoctorQs(q) { localStorage.setItem('romi_qs',   JSON.stringify(q)); }
+function saveLog(log)       { const l=getLogs(); l.unshift(log); localStorage.setItem('romi_logs', JSON.stringify(l)); }
+function saveDoctorQs(q)   { localStorage.setItem('romi_qs',      JSON.stringify(q)); }
+function saveToHistory(msg) { const h=getChatHistory(); h.push(msg); localStorage.setItem('romi_history', JSON.stringify(h)); }
 
 // ═══════ ROUTING ═══════
 function show(p) {
@@ -500,12 +527,15 @@ function toggleSaveRes(id) {
 // ═══════ DOCTOR QUESTIONS ═══════
 function pickRandomQs() {
   return [...ALL_QS].sort(() => Math.random() - .5).slice(0, 5)
-    .map((t, i) => ({ id: 'q' + Date.now() + i, text: t, checked: false }));
+    .map((t, i) => ({ id: 'q' + Date.now() + i, text: t }));
 }
 
 function initQs() {
   let qs = getDoctorQs();
-  if (!qs) { qs = pickRandomQs(); saveDoctorQs(qs); }
+  if (!qs) {
+    qs = BASE_QS.map((t, i) => ({ id: 'q' + i, text: t }));
+    saveDoctorQs(qs);
+  }
   renderQs(qs);
 }
 
@@ -560,7 +590,7 @@ function askDoctorQuestion(text) {
     if (inp) {
       inp.value = text;
       document.getElementById('chatSend').disabled = false;
-      sendChat();
+      inp.focus();
     }
   }, 160);
 }
@@ -576,8 +606,44 @@ function renderChat() {
   const container = document.getElementById('chatMsgs');
   if (!container) return;
   container.innerHTML = '';
-  const msgs = getChat();
-  (msgs.length ? msgs : [WELCOME]).slice(-14).forEach(m => appendBubble(m));
+  appendBubble(WELCOME);
+
+  // Clear input for fresh session
+  const inp = document.getElementById('chatInput');
+  if (inp) inp.value = '';
+  const sendBtn = document.getElementById('chatSend');
+  if (sendBtn) sendBtn.disabled = true;
+}
+
+function toggleHistory() {
+  const body = document.getElementById('historyBody');
+  const chevron = document.querySelector('.history-chevron');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  chevron.classList.toggle('open', !isOpen);
+  if (!isOpen) renderHistory();
+}
+
+function renderHistory() {
+  const body = document.getElementById('historyBody');
+  if (!body) return;
+  const hist = getChatHistory();
+  if (!hist.length) {
+    body.innerHTML = '<p style="font-size:12px;color:var(--t3);padding:8px 0">No history yet.</p>';
+    return;
+  }
+  // Group by day
+  const groups = {};
+  hist.forEach(m => {
+    const day = new Date(m.t).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    if (!groups[day]) groups[day] = [];
+    groups[day].push(m);
+  });
+  body.innerHTML = Object.entries(groups).reverse().map(([day, msgs]) => `
+    <div class="hist-item">
+      <div class="hist-date">${day}</div>
+      ${msgs.map(m => `<div class="hist-msg ${m.role}"><span class="role">${m.role === 'user' ? 'You' : 'romi'}:</span>${escHtml(m.text)}</div>`).join('')}
+    </div>`).join('');
 }
 
 function appendBubble(msg) {
@@ -634,9 +700,7 @@ async function sendChat() {
   const detected = detectSymptoms(text);
   const userMsg = { role: 'user', text, detected, t: new Date().toISOString() };
 
-  const msgs = getChat().length ? getChat() : [WELCOME];
-  msgs.push(userMsg);
-  saveChat(msgs);
+  saveToHistory(userMsg);
   appendBubble(userMsg);
 
   if (detected.length) {
@@ -672,8 +736,7 @@ async function sendChat() {
   if (td) td.remove();
 
   const aiMsg = { role: 'ai', text: String(resp), t: new Date().toISOString() };
-  msgs.push(aiMsg);
-  saveChat(msgs);
+  saveToHistory(aiMsg);
   appendBubble(aiMsg);
   lucide.createIcons();
 }
